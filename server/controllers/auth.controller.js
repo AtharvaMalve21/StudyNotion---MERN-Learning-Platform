@@ -89,6 +89,7 @@ export const signup = async (req, res) => {
 
     res.status(201).json({
       success: true,
+      data: newUser,
       message:
         "Signup successful! A verification OTP has been sent to your email address.",
     });
@@ -156,6 +157,7 @@ export const login = async (req, res) => {
 
     return res.status(200).json({
       success: true,
+      data: existingUser,
       message: `Login successful. Welcome back, ${existingUser.firstName} `,
     });
   } catch (err) {
@@ -168,7 +170,11 @@ export const login = async (req, res) => {
 
 export const logout = async (req, res) => {
   try {
-    res.clearCookie("token");
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+    });
 
     return res.status(200).json({
       success: true,
@@ -234,6 +240,7 @@ export const verifyAccount = async (req, res) => {
 
     return res.status(200).json({
       success: true,
+      data: user,
       message:
         "Your account has been successfully verified. You are now logged in.",
     });
@@ -258,7 +265,7 @@ export const forgotPassword = async (req, res) => {
     if (!user) {
       return res.status(400).json({
         success: false,
-        message: "No account found with this email address.",
+        message: "If the email is registered, an OTP has been sent.",
       });
     }
 

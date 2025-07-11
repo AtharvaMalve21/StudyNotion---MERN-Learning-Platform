@@ -5,11 +5,11 @@ const profileSchema = new Schema(
   {
     profileImage: {
       type: String,
-      required: true,
     },
     contact: {
       type: String,
       required: true,
+      match: /^[6-9]\d{9}$/, 
     },
     gender: {
       type: String,
@@ -22,7 +22,6 @@ const profileSchema = new Schema(
     },
     bio: {
       type: String,
-      required: true,
     },
     profession: {
       type: String,

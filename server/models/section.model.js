@@ -11,7 +11,6 @@ const sectionSchema = new Schema(
       {
         type: Schema.Types.ObjectId,
         ref: "SubSection",
-        required: true,
       },
     ],
   },

@@ -5,8 +5,9 @@ const router = express.Router();
 import {
   createCourse,
   showAllCourses,
-  updateCourse,
-  deleteCourse,
+  filterCoursesByCategory,
+  updateExistingCourse,
+  deleteExistingCourse,
 } from "../controllers/course.controller.js";
 
 import {
@@ -24,13 +25,20 @@ router.post(
 
 router.get("/", showAllCourses);
 
-router.put("/:id", isAuthenticated, isAuthorized("Instructor"), updateCourse);
+router.get("/:filter", filterCoursesByCategory);
+
+router.put(
+  "/:id",
+  isAuthenticated,
+  isAuthorized("Instructor"),
+  updateExistingCourse
+);
 
 router.delete(
   "/:id",
   isAuthenticated,
   isAuthorized("Instructor"),
-  deleteCourse
+  deleteExistingCourse
 );
 
 export default router;

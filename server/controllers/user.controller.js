@@ -1,12 +1,13 @@
 import User from "../models/user.model.js";
 import Profile from "../models/profile.model.js";
 import { v2 as cloudinary } from "cloudinary";
+import fs from "fs";
 
 export const getProfile = async (req, res) => {
   try {
     //authenticate user
     const userId = req.user._id;
-    const user = await User.findById(userId).populate("additionalDetails");
+    const user = await User.findById(userId).select("-password").populate("additionalDetails");
     if (!user) {
       return res.status(400).json({
         success: false,
@@ -91,6 +92,8 @@ export const updateProfile = async (req, res) => {
 
         await profile.save();
 
+        fs.unlinkSync(profileImage);
+
         return res.status(200).json({
           success: true,
           data: profile,
@@ -110,6 +113,8 @@ export const updateProfile = async (req, res) => {
 
     user.additionalDetails = newProfile._id;
     await user.save();
+
+    fs.unlinkSync(profileImage);
 
     return res.status(200).json({
       success: true,

@@ -2,8 +2,9 @@ import express from "express";
 const router = express.Router();
 
 import {
-  createReview,
-  getReviews,
+  addReview,
+  getReview,
+  updateReview,
   deleteReview,
 } from "../controllers/rating-and-review.controller.js";
 
@@ -12,12 +13,11 @@ import {
   isAuthorized,
 } from "../middleware/auth.middleware.js";
 
-router.post("/:id", isAuthenticated, isAuthorized("Student"), createReview);
+router.post("/:id", isAuthenticated, isAuthorized("Student"), addReview);
 
-router.get(
-  "/:id",
-  getReviews
-);
+router.get("/:id", getReview);
+
+router.put("/:id", isAuthenticated, isAuthorized("Instructor"), updateReview);
 
 router.delete("/:id", isAuthenticated, isAuthorized("Student"), deleteReview);
 

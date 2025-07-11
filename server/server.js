@@ -13,9 +13,11 @@ dotenv.config();
 //route handlers
 import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/user.routes.js";
-// import categoryRoutes from "./routes/category.routes.js";
-// import ratingAndReviewRoutes from "./routes/rating-and-review.routes.js";
-// import courseRoutes from "./routes/course.routes.js";
+import categoryRoutes from "./routes/category.routes.js";
+import ratingAndReviewRoutes from "./routes/rating-and-review.routes.js";
+import courseRoutes from "./routes/course.routes.js";
+import sectionRoutes from "./routes/section.routes.js";
+import subSectionRoutes from "./routes/sub-section.routes.js";
 
 //initialize app instance
 const app = express();
@@ -44,14 +46,16 @@ connectToCloudinary();
 // route handlers
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
-// app.use("/api/category", categoryRoutes);
-// app.use("/api/rating-and-review", ratingAndReviewRoutes);
-// app.use("/api/course", courseRoutes);
+app.use("/api/category", categoryRoutes);
+app.use("/api/rating-and-review", ratingAndReviewRoutes);
+app.use("/api/course", courseRoutes);
+app.use("/api/section", sectionRoutes);
+app.use("/api/sub-section", subSectionRoutes);
 
 app.get("/", (req, res) => {
   res.json({ message: "Study Notion" });
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT} `);
+  console.log(`🚀 Server running on port http://localhost:${PORT} `);
 });
