@@ -4,16 +4,6 @@ import Section from "../models/section.model.js";
 
 export const createSection = async (req, res) => {
   try {
-    //authenticate user
-    const userId = req.user._id;
-    const user = await User.findById(userId);
-    if (!user || user.accountType !== "Instructor") {
-      return res.status(400).json({
-        success: false,
-        message: "Instructor not found.",
-      });
-    }
-
     //find the course
     const { id: courseId } = req.params;
     const course = await Course.findById(courseId);
@@ -56,7 +46,8 @@ export const createSection = async (req, res) => {
         $push: {
           courseContent: section._id,
         },
-      }
+      },
+      { new: true }
     );
 
     return res.status(201).json({
@@ -90,16 +81,6 @@ export const showAllSections = async (req, res) => {
 
 export const updateExistingSection = async (req, res) => {
   try {
-    //authenticate user
-    const userId = req.user._id;
-    const user = await User.findById(userId);
-    if (!user || user.accountType !== "Instructor") {
-      return res.status(400).json({
-        success: false,
-        message: "Instructor not found.",
-      });
-    }
-
     //find the section
     const { id: sectionId } = req.params;
     const section = await Section.findById(sectionId);
@@ -131,16 +112,6 @@ export const updateExistingSection = async (req, res) => {
 
 export const deleteExistingSection = async (req, res) => {
   try {
-    //authenticate user
-    const userId = req.user._id;
-    const user = await User.findById(userId);
-    if (!user || user.accountType !== "Instructor") {
-      return res.status(400).json({
-        success: false,
-        message: "Instructor not found.",
-      });
-    }
-
     //find the section
     const { id: sectionId } = req.params;
     const section = await Section.findById(sectionId);

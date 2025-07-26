@@ -17,7 +17,7 @@ router.post("/:id", isAuthenticated, isAuthorized("Student"), addReview);
 
 router.get("/:id", getReview);
 
-router.put("/:id", isAuthenticated, isAuthorized("Instructor"), updateReview);
+router.put("/:id", isAuthenticated, isAuthorized("Student"), updateReview);
 
 router.delete("/:id", isAuthenticated, isAuthorized("Student"), deleteReview);
 

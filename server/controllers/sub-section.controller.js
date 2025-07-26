@@ -5,16 +5,6 @@ import { v2 as cloudinary } from "cloudinary";
 
 export const createSubSection = async (req, res) => {
   try {
-    //authenticate user
-    const userId = req.user._id;
-    const user = await User.findById(userId);
-    if (!user || user.accountType !== "Instructor") {
-      return res.status(400).json({
-        success: false,
-        message: "Instructor not found.",
-      });
-    }
-
     //find the section
     const { id: sectionId } = req.params;
     const section = await Section.findById(sectionId);
@@ -46,7 +36,7 @@ export const createSubSection = async (req, res) => {
 
     //upload it to cloudinary
     const cloudinaryResponse = await cloudinary.uploader.upload(videoURL, {
-      folder: "study-notion",
+      folder: "study-notion/courses",
     });
 
     //create entry into db
@@ -64,7 +54,8 @@ export const createSubSection = async (req, res) => {
         $push: {
           subSection: subSection._id,
         },
-      }
+      },
+      { new: true }
     );
 
     return res.status(201).json({
@@ -99,16 +90,6 @@ export const showAllSubSections = async (req, res) => {
 
 export const updateSubSection = async (req, res) => {
   try {
-    //authenticate user
-    const userId = req.user._id;
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: "No Instructor found",
-      });
-    }
-
     //find the subsection
     const { id: subSectionId } = req.params;
     const subSection = await SubSection.findById(subSectionId);
@@ -125,14 +106,14 @@ export const updateSubSection = async (req, res) => {
     let cloudinaryResponse;
     if (videoURL) {
       cloudinaryResponse = await cloudinary.uploader.upload(videoURL, {
-        folder: "study-notion",
+        folder: "study-notion/courses",
       });
     }
     //update the entry from db
     subSection.title = title || subSection.title;
     subSection.description = description || subSection.description;
     subSection.timeDuration = timeDuration || subSection.timeDuration;
-    subSection.videoURL = videoURL || subSection.videoURL;
+    subSection.videoURL = cloudinaryResponse.secure_url || subSection.videoURL;
     await subSection.save();
 
     return res.status(200).json({
@@ -150,17 +131,6 @@ export const updateSubSection = async (req, res) => {
 
 export const deleteSubSection = async (req, res) => {
   try {
-    //authenticate the user
-    //authenticate user
-    const userId = req.user._id;
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: "No Instruction found",
-      });
-    }
-
     //find the subsection
     const { id: subSectionId } = req.params;
     const subSection = await SubSection.findById(subSectionId);

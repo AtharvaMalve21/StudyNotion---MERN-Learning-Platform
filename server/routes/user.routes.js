@@ -4,7 +4,7 @@ const router = express.Router();
 import {
   getProfile,
   updateProfile,
-  deleteProfile,
+  deleteAccount,
 } from "../controllers/user.controller.js";
 
 import {
@@ -17,7 +17,7 @@ import upload from "../utils/fileUploader.js";
 router.get("/profile", isAuthenticated, getProfile);
 
 router.put(
-  "/edit-profile",
+  "/update-profile",
   upload.single("profileImage"),
   isAuthenticated,
   updateProfile
@@ -27,7 +27,7 @@ router.delete(
   "/profile/:id",
   isAuthenticated,
   isAuthorized("Admin"),
-  deleteProfile
+  deleteAccount
 );
 
 export default router;

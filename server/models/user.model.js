@@ -27,7 +27,6 @@ const userSchema = new Schema(
     },
     confirmPassword: {
       type: String,
-      required: true,
     },
     accountType: {
       type: String,

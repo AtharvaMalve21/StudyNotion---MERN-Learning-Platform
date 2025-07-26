@@ -7,19 +7,17 @@ import fs from "fs";
 
 export const createCourse = async (req, res) => {
   try {
-    //authenticate user
-    const userId = req.user._id;
-    const user = await User.findById(userId);
-    if (!user || user.accountType !== "Instructor") {
-      return res.status(400).json({
-        success: false,
-        message: "Only instructors can create a course.",
-      });
-    }
+    const instructorId = req.user._id;
 
     //fetch course details
-    const { courseName, courseDescription, whatWillYouLearn, price, category } =
-      req.body;
+    const {
+      courseName,
+      courseDescription,
+      whatWillYouLearn,
+      price,
+      category,
+      tags,
+    } = req.body;
 
     //validate details
     if (
@@ -45,7 +43,7 @@ export const createCourse = async (req, res) => {
 
     //upload thumbnail to cloudinary
     const cloudinaryResponse = await cloudinary.uploader.upload(thumbnail, {
-      folder: "study-notion",
+      folder: "study-notion/courses",
     });
 
     //optional - check for existing course
@@ -58,6 +56,7 @@ export const createCourse = async (req, res) => {
     // }
 
     //fetch the category
+
     const categoryDetails = await Category.findById(category);
     if (!categoryDetails) {
       return res.status(400).json({
@@ -74,12 +73,14 @@ export const createCourse = async (req, res) => {
       price: price,
       thumbnail: cloudinaryResponse.secure_url,
       category: categoryDetails._id,
-      instructor: userId,
+      tags: tags,
+      instructor: instructorId,
+      isPublished: true,
     });
 
     //update the user model
     await User.findByIdAndUpdate(
-      { _id: userId },
+      { _id: instructorId },
       {
         $push: {
           courses: newCourse._id,
@@ -116,7 +117,7 @@ export const createCourse = async (req, res) => {
 
 export const showAllCourses = async (req, res) => {
   try {
-    const courses = await Course.find({}).populate(
+    const courses = await Course.find({ isPublished: true }).populate(
       "instructor category studentsEnrolled ratingAndReviews"
     );
 
@@ -137,12 +138,13 @@ export const filterCoursesByCategory = async (req, res) => {
   try {
     const { query } = req.query;
 
-    const courses = await Course.find({ category: query });
-
+    const courses = await Course.find({ category: query }).populate(
+      "instructor category studentsEnrolled ratingAndReviews"
+    );
     return res.status(200).json({
       success: true,
       data: courses,
-      message: "Coures filtered by category.",
+      message: "Courses filtered by category.",
     });
   } catch (err) {
     res.status(500).json({
@@ -154,15 +156,7 @@ export const filterCoursesByCategory = async (req, res) => {
 
 export const updateExistingCourse = async (req, res) => {
   try {
-    //authenticate user
-    const userId = req.user._id;
-    const user = await User.findById(userId);
-    if (!user || user.accountType !== "Instructor") {
-      return res.status(403).json({
-        success: false,
-        message: "Only instructors can update courses.",
-      });
-    }
+    const instructorId = req.user._id;
 
     //find the course
     const { id: courseId } = req.params;
@@ -175,15 +169,21 @@ export const updateExistingCourse = async (req, res) => {
     }
 
     //fetch the  course details
-    const { courseName, courseDescription, whatWillYouLearn, price, category } =
-      req.body;
+    const {
+      courseName,
+      courseDescription,
+      whatWillYouLearn,
+      price,
+      category,
+      tags,
+    } = req.body;
 
     const thumbnail = req.file?.path;
 
     let cloudinaryResponse;
     if (thumbnail) {
       cloudinaryResponse = await cloudinary.uploader.upload(thumbnail, {
-        folder: "study-notion",
+        folder: "study-notion/courses",
       });
     }
 
@@ -197,7 +197,7 @@ export const updateExistingCourse = async (req, res) => {
     }
 
     //find the instructor who created the course can only update it
-    if (course.instructor.toString() !== userId.toString()) {
+    if (course.instructor.toString() !== instructorId.toString()) {
       return res.status(400).json({
         success: false,
         message: "Instructor cannot update this course.",
@@ -210,6 +210,7 @@ export const updateExistingCourse = async (req, res) => {
     course.price = price || course.price;
     course.thumbnail = cloudinaryResponse.secure_url || course.thumbnail;
     course.category = categoryDetails._id || course.category;
+    course.tags = tags || course.tags;
     await course.save();
 
     if (thumbnail) {
@@ -231,15 +232,7 @@ export const updateExistingCourse = async (req, res) => {
 
 export const deleteExistingCourse = async (req, res) => {
   try {
-    //authenticate the user
-    const userId = req.user._id;
-    const user = await User.findById(userId);
-    if (!user || user.accountType !== "Instructor") {
-      return res.status(400).json({
-        success: false,
-        message: "Only instructors can delete courses.",
-      });
-    }
+    const instructorId = req.user._id;
 
     //find the course
     const { id: courseId } = req.params;
@@ -252,7 +245,7 @@ export const deleteExistingCourse = async (req, res) => {
     }
 
     //find the instructor who created the course can only delete it
-    if (course.instructor.toString() !== userId.toString()) {
+    if (course.instructor.toString() !== instructorId.toString()) {
       return res.status(403).json({
         success: false,
         message: "You are not authorized to delete this course.",
@@ -263,7 +256,7 @@ export const deleteExistingCourse = async (req, res) => {
 
     //update the user model
     await User.findByIdAndUpdate(
-      { _id: userId },
+      { _id: instructorId },
       {
         $pull: {
           courses: courseId,
@@ -298,18 +291,13 @@ export const deleteExistingCourse = async (req, res) => {
   }
 };
 
-//optional - students enrolled to courses
+//optional - students enrolled to courses (add payment gateway)
 export const studentEnrolledCourse = async (req, res) => {
   try {
-    //authenticate user
     const userId = req.user._id;
-    const user = await User.findById(userId);
-    if (!user || user.accountType !== "Student") {
-      return res.status(400).json({
-        success: false,
-        message: "No Student registered with the given email address.",
-      });
-    }
+
+    //find the student
+    const student = await User.findOne({ _id: userId, accountType: "Student" });
 
     //find the course
     const { id: courseId } = req.params;
@@ -322,7 +310,7 @@ export const studentEnrolledCourse = async (req, res) => {
     }
 
     // Check if already enrolled
-    if (user.courses.includes(course._id)) {
+    if (student.courses.includes(course._id)) {
       return res.status(400).json({
         success: false,
         message: "You are already enrolled in this course.",
@@ -331,7 +319,7 @@ export const studentEnrolledCourse = async (req, res) => {
 
     //update the user model
     await User.findByIdAndUpdate(
-      { _id: user._id },
+      { _id: userId },
       {
         $push: {
           courses: course._id,
@@ -344,14 +332,14 @@ export const studentEnrolledCourse = async (req, res) => {
       { _id: course._id },
       {
         $push: {
-          studentsEnrolled: user._id,
+          studentsEnrolled: userId,
         },
       }
     );
 
     return res.status(200).json({
       success: true,
-      message: `Congratulations ${user.firstName}. You have successfully enrolled in the course ${course.courseName}`,
+      message: `Congratulations ${student.firstName}. You have successfully enrolled in the course ${course.courseName}`,
     });
   } catch (err) {
     res.status(500).json({

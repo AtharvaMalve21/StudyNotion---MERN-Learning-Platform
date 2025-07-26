@@ -44,12 +44,22 @@ const courseSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Category",
     },
+    tags: [
+      {
+        type: String,
+        required: true,
+      },
+    ],
     studentsEnrolled: [
       {
         type: Schema.Types.ObjectId,
         ref: "User",
       },
     ],
+    isPublished: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

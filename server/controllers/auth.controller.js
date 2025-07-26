@@ -10,6 +10,12 @@ dotenv.config();
 
 const saltRounds = 10;
 
+const isStrongPassword = (password) => {
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  return passwordRegex.test(password);
+};
+
 export const signup = async (req, res) => {
   try {
     // fetch the user details
@@ -47,11 +53,6 @@ export const signup = async (req, res) => {
           "An account with this email already exists. Please log in or use another email.",
       });
     }
-    const isStrongPassword = (password) => {
-      const passwordRegex =
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-      return passwordRegex.test(password);
-    };
 
     if (!isStrongPassword(password)) {
       return res.status(400).json({
@@ -78,11 +79,8 @@ export const signup = async (req, res) => {
       lastName: lastName,
       email: email,
       password: hashedPassword,
-      confirmPassword: hashedPassword,
       accountType: accountType,
     });
-
-    console.log(newUser);
 
     // send verification otp
     await sendVerificationOTP(email);
@@ -261,6 +259,7 @@ export const forgotPassword = async (req, res) => {
         message: "Email is required to reset password.",
       });
     }
+
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({
@@ -325,12 +324,6 @@ export const resetPassword = async (req, res) => {
       });
     }
 
-    const isStrongPassword = (password) => {
-      const passwordRegex =
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-      return passwordRegex.test(password);
-    };
-
     if (!isStrongPassword(newPassword)) {
       return res.status(400).json({
         success: false,
@@ -366,7 +359,6 @@ export const resetPassword = async (req, res) => {
     }
     const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
     user.password = hashedPassword;
-    user.confirmPassword = hashedPassword;
     user.resetPasswordOTP = undefined;
     user.resetPasswordOTPExpiresAt = undefined;
     await user.save();

@@ -8,6 +8,7 @@ import {
   filterCoursesByCategory,
   updateExistingCourse,
   deleteExistingCourse,
+  studentEnrolledCourse,
 } from "../controllers/course.controller.js";
 
 import {
@@ -39,6 +40,13 @@ router.delete(
   isAuthenticated,
   isAuthorized("Instructor"),
   deleteExistingCourse
+);
+
+router.get(
+  "/enrolled-courses",
+  isAuthenticated,
+  isAuthorized("Student", "Instructor"),
+  studentEnrolledCourse
 );
 
 export default router;

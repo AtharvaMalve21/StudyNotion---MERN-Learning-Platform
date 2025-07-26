@@ -6,11 +6,12 @@ const sectionSchema = new Schema(
     sectionName: {
       type: String,
       required: true,
-    },
+    },  
     subSection: [
       {
         type: Schema.Types.ObjectId,
         ref: "SubSection",
+        required: true,
       },
     ],
   },

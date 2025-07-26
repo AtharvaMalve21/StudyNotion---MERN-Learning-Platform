@@ -33,6 +33,7 @@ export const isAuthenticated = async (req, res, next) => {
 };
 
 export const isAuthorized = (...accountType) => {
+  
   return async function (req, res, next) {
     const account = req.user.accountType;
 

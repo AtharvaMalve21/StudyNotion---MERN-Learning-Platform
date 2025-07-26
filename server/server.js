@@ -7,7 +7,6 @@ import connectDB from "./config/db.js";
 import connectToCloudinary from "./config/cloudinary.js";
 import path from "path";
 import { fileURLToPath } from "url";
-
 dotenv.config();
 
 //route handlers
@@ -47,7 +46,7 @@ connectToCloudinary();
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/category", categoryRoutes);
-app.use("/api/rating-and-review", ratingAndReviewRoutes);
+app.use("/api/rating", ratingAndReviewRoutes);
 app.use("/api/course", courseRoutes);
 app.use("/api/section", sectionRoutes);
 app.use("/api/sub-section", subSectionRoutes);

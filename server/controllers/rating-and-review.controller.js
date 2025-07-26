@@ -4,15 +4,7 @@ import RatingAndReview from "../models/rating-and-review.model.js";
 
 export const addReview = async (req, res) => {
   try {
-    //authenticate user
     const userId = req.user._id;
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: "User not found.",
-      });
-    }
 
     //find the course
     const { id: courseId } = req.params;
@@ -99,15 +91,7 @@ export const getReview = async (req, res) => {
 
 export const updateReview = async (req, res) => {
   try {
-    //authenticate user
     const userId = req.user._id;
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: "User not found.",
-      });
-    }
 
     //find the review
     const { id: reviewId } = req.params;
@@ -121,9 +105,9 @@ export const updateReview = async (req, res) => {
 
     //check if the user reviewed only has access to update
     if (review.user.toString() !== userId.toString()) {
-      return res.status(400).json({
+      return res.status(403).json({
         success: false,
-        message: "Cannot update review",
+        message: "Not authorized to update the review",
       });
     }
 
@@ -149,15 +133,8 @@ export const updateReview = async (req, res) => {
 
 export const deleteReview = async (req, res) => {
   try {
-    //authenticate user
+
     const userId = req.user._id;
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: "User not found.",
-      });
-    }
 
     //find the review
     const { id: reviewId } = req.params;
@@ -171,9 +148,9 @@ export const deleteReview = async (req, res) => {
 
     //check if the user reviewed only has access to delete
     if (review.user.toString() !== userId.toString()) {
-      return res.status(400).json({
+      return res.status(403).json({
         success: false,
-        message: "Cannot delete review",
+        message: "Not authorized to delete this review",
       });
     }
 
