@@ -68,19 +68,68 @@ export const addReview = async (req, res) => {
   }
 };
 
-export const getReview = async (req, res) => {
+export const getAllRatingAndReviews = async (req, res) => {
   try {
-    const { id: courseId } = req.params;
-
-    const reviews = await RatingAndReview.find({ course: courseId }).populate(
-      "user course"
-    );
+    const reviews = await RatingAndReview.find({}).populate("course user");
 
     return res.status(200).json({
       success: true,
       data: reviews,
       message: "Reviews data fetched.",
     });
+  } catch (err) {
+    res.status(200).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
+export const getReview = async (req, res) => {
+  try {
+    const { id: courseId } = req.params;
+    const reviews = await RatingAndReview.find({ course: courseId }).populate(
+      "user course"
+    );
+    return res.status(200).json({
+      success: true,
+      data: reviews,
+      message: "Reviews data fetched.",
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
+export const getAverageRating = async (req, res) => {
+  try {
+    const { id: courseId } = req.body;
+
+    const courseReviews = await RatingAndReview.find({ course: courseId });
+
+    const totalRating = courseReviews.reduce(
+      (sum, review) => sum + review.rating,
+      0
+    );
+
+    if (totalRating == 0) {
+      return res.status(200).json({
+        success: true,
+        data: 0,
+        message: "Average rating is 0, no ratings given till now",
+      });
+    } else {
+      const averageRating = totalRating / courseReviews.length;
+
+      return res.status(200).json({
+        success: true,
+        data: averageRating,
+        message: "Average rating data fetched.",
+      });
+    }
   } catch (err) {
     res.status(500).json({
       success: false,
@@ -133,7 +182,6 @@ export const updateReview = async (req, res) => {
 
 export const deleteReview = async (req, res) => {
   try {
-
     const userId = req.user._id;
 
     //find the review

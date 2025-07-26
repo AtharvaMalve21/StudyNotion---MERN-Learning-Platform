@@ -2,8 +2,12 @@ import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import { sendVerificationOTP } from "../utils/sendVerificationOTP.js";
-import { resetPasswordOTPTemplate } from "../utils/resetPasswordTemplate.js";
+
+import {
+  otpVerificationTemplate,
+  resetPasswordOTPTemplate,
+} from "../utils/emailTemplate.utils.js";
+
 import transporter from "../utils/mailSender.js";
 import crypto from "crypto";
 dotenv.config();
@@ -240,8 +244,7 @@ export const verifyAccount = async (req, res) => {
     return res.status(200).json({
       success: true,
       data: user,
-      message:
-        "Your account has been successfully verified.",
+      message: "Your account has been successfully verified.",
     });
   } catch (err) {
     res.status(500).json({

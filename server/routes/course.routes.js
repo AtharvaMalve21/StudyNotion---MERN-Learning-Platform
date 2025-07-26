@@ -5,6 +5,7 @@ const router = express.Router();
 import {
   createCourse,
   showAllCourses,
+  getCourseDetails,
   filterCoursesByCategory,
   updateExistingCourse,
   deleteExistingCourse,
@@ -27,6 +28,8 @@ router.post(
 router.get("/", showAllCourses);
 
 router.get("/:filter", filterCoursesByCategory);
+
+router.get("/details/:id", getCourseDetails);
 
 router.put(
   "/:id",

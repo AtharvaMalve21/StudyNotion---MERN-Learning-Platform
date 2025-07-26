@@ -3,8 +3,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
-import connectDB from "./config/db.js";
-import connectToCloudinary from "./config/cloudinary.js";
+import connectDB from "./config/db.config.js";
+import connectToCloudinary from "./config/cloudinary.config.js";
 import path from "path";
 import { fileURLToPath } from "url";
 dotenv.config();
@@ -17,6 +17,7 @@ import ratingAndReviewRoutes from "./routes/rating-and-review.routes.js";
 import courseRoutes from "./routes/course.routes.js";
 import sectionRoutes from "./routes/section.routes.js";
 import subSectionRoutes from "./routes/sub-section.routes.js";
+import messageRoutes from "./routes/message.routes.js";
 
 //initialize app instance
 const app = express();
@@ -50,6 +51,7 @@ app.use("/api/rating", ratingAndReviewRoutes);
 app.use("/api/course", courseRoutes);
 app.use("/api/section", sectionRoutes);
 app.use("/api/sub-section", subSectionRoutes);
+app.use("/api/message", messageRoutes);
 
 app.get("/", (req, res) => {
   res.json({ message: "Study Notion" });

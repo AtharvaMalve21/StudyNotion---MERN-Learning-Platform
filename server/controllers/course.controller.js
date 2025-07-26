@@ -117,14 +117,69 @@ export const createCourse = async (req, res) => {
 
 export const showAllCourses = async (req, res) => {
   try {
-    const courses = await Course.find({ isPublished: true }).populate(
-      "instructor category studentsEnrolled ratingAndReviews"
-    );
+    const courses = await Course.find({ isPublished: true })
+      .populate({
+        path: "instructor",
+        populate: {
+          path: "additionalDetails",
+        },
+      })
+      .populate("category")
+      .populate({
+        path: "courseContent",
+        populate: {
+          path: "subSection",
+        },
+      })
+      .exec();
 
     return res.status(200).json({
       success: true,
       data: courses,
       message: "Courses data fetched.",
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
+export const getCourseDetails = async (req, res) => {
+  try {
+    const { id: courseId } = req.params;
+
+    const course = await Course.findOne({
+      _id: courseId,
+      isPublished: true,
+    })
+      .populate({
+        path: "instructor",
+        populate: {
+          path: "additionalDetails",
+        },
+      })
+      .populate("category")
+      .populate({
+        path: "courseContent",
+        populate: {
+          path: "subSection",
+        },
+      })
+      .exec();
+
+    if (!course) {
+      return res.status(400).json({
+        success: false,
+        message: "Course is not found with the provided id.",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: course,
+      message: "Course details fetched successfully.",
     });
   } catch (err) {
     res.status(500).json({
