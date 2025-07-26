@@ -69,6 +69,7 @@ export const updateProfile = async (req, res) => {
       cloudinaryResponse = await cloudinary.uploader.upload(profileImage, {
         folder: "study-notion/users",
       });
+      fs.unlinkSync(profileImage);
     }
 
     // Either update or create profile

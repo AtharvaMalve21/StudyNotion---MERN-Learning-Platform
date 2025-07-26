@@ -27,6 +27,7 @@ export const signup = async (req, res) => {
       confirmPassword,
       accountType,
     } = req.body;
+    console.log(req.body);
 
     // validate user details
     if (
@@ -240,7 +241,7 @@ export const verifyAccount = async (req, res) => {
       success: true,
       data: user,
       message:
-        "Your account has been successfully verified. You are now logged in.",
+        "Your account has been successfully verified.",
     });
   } catch (err) {
     res.status(500).json({
