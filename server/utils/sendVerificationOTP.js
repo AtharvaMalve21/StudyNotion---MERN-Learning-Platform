@@ -1,6 +1,6 @@
 import User from "../models/user.model.js";
 import transporter from "./mailSender.js";
-import { otpVerificationTemplate } from "./otpVerificationTemplate.js";
+import { otpVerificationTemplate } from "./emailTemplate.utils.js";
 
 export const sendVerificationOTP = async (email) => {
   try {

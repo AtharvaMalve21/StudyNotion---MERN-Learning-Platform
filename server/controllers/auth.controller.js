@@ -2,12 +2,11 @@ import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-
 import {
   otpVerificationTemplate,
   resetPasswordOTPTemplate,
 } from "../utils/emailTemplate.utils.js";
-
+import { sendVerificationOTP } from "../utils/sendVerificationOTP.js";
 import transporter from "../utils/mailSender.js";
 import crypto from "crypto";
 dotenv.config();
@@ -31,7 +30,6 @@ export const signup = async (req, res) => {
       confirmPassword,
       accountType,
     } = req.body;
-    console.log(req.body);
 
     // validate user details
     if (
@@ -283,7 +281,7 @@ export const forgotPassword = async (req, res) => {
     await transporter.sendMail({
       from: process.env.MAIL_USER,
       to: email,
-      subject: "Reset Password OTP",
+      subject: "Study-Notion | Reset Password OTP",
       html: resetPasswordOTPTemplate(user.firstName, otp),
     });
 

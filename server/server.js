@@ -47,7 +47,7 @@ connectToCloudinary();
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/category", categoryRoutes);
-app.use("/api/rating", ratingAndReviewRoutes);
+app.use("/api/review", ratingAndReviewRoutes);
 app.use("/api/course", courseRoutes);
 app.use("/api/section", sectionRoutes);
 app.use("/api/sub-section", subSectionRoutes);

@@ -2,6 +2,7 @@ import User from "../models/user.model.js";
 import Section from "../models/section.model.js";
 import SubSection from "../models/sub-section.model.js";
 import { v2 as cloudinary } from "cloudinary";
+import fs from "fs";
 
 export const createSubSection = async (req, res) => {
   try {
@@ -36,7 +37,8 @@ export const createSubSection = async (req, res) => {
 
     //upload it to cloudinary
     const cloudinaryResponse = await cloudinary.uploader.upload(videoURL, {
-      folder: "study-notion/courses",
+      resource_type: "video",
+      folder: "study-notion/courses/lecture-videos",
     });
 
     //create entry into db
@@ -57,6 +59,8 @@ export const createSubSection = async (req, res) => {
       },
       { new: true }
     );
+
+    fs.unlinkSync(videoURL);
 
     return res.status(201).json({
       success: true,

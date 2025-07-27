@@ -27,9 +27,9 @@ router.post(
 
 router.get("/", showAllCourses);
 
-router.get("/:filter", filterCoursesByCategory);
+router.get("/filter", filterCoursesByCategory);
 
-router.get("/details/:id", getCourseDetails);
+router.get("/:id", getCourseDetails);
 
 router.put(
   "/:id",

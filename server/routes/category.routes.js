@@ -4,6 +4,7 @@ const router = express.Router();
 import {
   addCategory,
   showAllCategory,
+  categoryPageDetails,
 } from "../controllers/category.controller.js";
 
 import {
@@ -14,5 +15,7 @@ import {
 router.post("/", isAuthenticated, isAuthorized("Instructor"), addCategory);
 
 router.get("/", showAllCategory);
+
+router.post("/details", categoryPageDetails);
 
 export default router;

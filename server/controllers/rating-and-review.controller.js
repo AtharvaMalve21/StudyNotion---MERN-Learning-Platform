@@ -25,6 +25,18 @@ export const addReview = async (req, res) => {
       });
     }
 
+    //only the enrolled students can add a review
+    const isStudentEnrolled = await Course.findOne({
+      studentsEnrolled: userId,
+    });
+
+    if (!isStudentEnrolled) {
+      return res.status(400).json({
+        success: false,
+        message: "Only enrolled students can add a review",
+      });
+    }
+
     //check for duplicate reviews by same user
     const alreadyReviewed = await RatingAndReview.findOne({
       user: userId,

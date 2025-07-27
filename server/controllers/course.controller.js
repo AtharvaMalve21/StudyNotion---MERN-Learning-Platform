@@ -191,23 +191,55 @@ export const getCourseDetails = async (req, res) => {
 
 export const filterCoursesByCategory = async (req, res) => {
   try {
-    const { query } = req.query;
+    const { category } = req.query;
 
-    const courses = await Course.find({ category: query }).populate(
-      "instructor category studentsEnrolled ratingAndReviews"
-    );
+    // Validate query
+    if (!category) {
+      return res.status(400).json({
+        success: false,
+        message: "Category name is required in query params.",
+      });
+    }
+
+    // Find the category
+    const categoryDoc = await Category.findOne({ name: category });
+
+    if (!categoryDoc) {
+      return res.status(404).json({
+        success: false,
+        message: "Category not found.",
+      });
+    }
+
+    // Find the courses under this category
+    const categoryCourses = await Course.find({ category: categoryDoc._id })
+      .populate({
+        path: "instructor",
+        populate: {
+          path: "additionalDetails",
+        },
+      })
+      .populate({
+        path: "courseContent",
+        populate: {
+          path: "subSection",
+        },
+      })
+      .populate("ratingAndReviews");
+
     return res.status(200).json({
       success: true,
-      data: courses,
-      message: "Courses filtered by category.",
+      data: categoryCourses,
+      message: "Category courses data fetched successfully.",
     });
   } catch (err) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
-      message: err.message,
+      message: "Something went wrong while fetching courses by category.",
+      error: err.message,
     });
   }
-};
+};  
 
 export const updateExistingCourse = async (req, res) => {
   try {

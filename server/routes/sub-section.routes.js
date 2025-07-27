@@ -1,9 +1,10 @@
 import express from "express";
 const router = express.Router();
+import upload from "../utils/fileUploader.js";
 
 import {
   createSubSection,
-  showAllSubSections
+  showAllSubSections,
 } from "../controllers/sub-section.controller.js";
 
 import {
@@ -11,7 +12,13 @@ import {
   isAuthorized,
 } from "../middleware/auth.middleware.js";
 
-router.post("/:id", isAuthenticated, isAuthorized("Instructor"), createSubSection);
+router.post(
+  "/:id",
+  isAuthenticated,
+  upload.single("videoURL"),
+  isAuthorized("Instructor"),
+  createSubSection
+);
 
 router.get("/", showAllSubSections);
 

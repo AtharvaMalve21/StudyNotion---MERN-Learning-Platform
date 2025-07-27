@@ -99,11 +99,6 @@ export const updateProfile = async (req, res) => {
       await user.save();
     }
 
-    // Clean up local file
-    if (profileImage) {
-      fs.unlinkSync(profileImage);
-    }
-
     return res.status(200).json({
       success: true,
       data: profile,
